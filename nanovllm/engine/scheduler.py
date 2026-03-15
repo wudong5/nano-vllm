@@ -1,4 +1,5 @@
 from collections import deque
+from time import time
 
 from nanovllm.config import Config
 from nanovllm.engine.sequence import Sequence, SequenceStatus
@@ -69,3 +70,7 @@ class Scheduler:
                 seq.status = SequenceStatus.FINISHED
                 self.block_manager.deallocate(seq)
                 self.running.remove(seq)
+            if seq.num_completion_tokens == 1:
+                seq.first_token_at = time.time()
+                ttft = seq.first_token_at - seq.created_at
+                print(f"seq {seq.seq_id} TTFT: {ttft*1000:.1f}ms")

@@ -57,7 +57,6 @@ class BlockManager:
         return len(self.free_block_ids) >= seq.num_blocks
 
     def allocate(self, seq: Sequence):
-        self.stats()
         assert not seq.block_table
         h = -1
         cache_miss = False
@@ -81,6 +80,7 @@ class BlockManager:
                 block.update(h, token_ids)
                 self.hash_to_block_id[h] = block_id
             seq.block_table.append(block_id)
+        self.stats()
             
     def stats(self):
         print(f"Total blocks: {len(self.blocks)}")
