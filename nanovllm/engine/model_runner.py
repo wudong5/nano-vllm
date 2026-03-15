@@ -144,6 +144,7 @@ class ModelRunner:
             max_seqlen_k = max(seqlen_k, max_seqlen_k)
             if not seq.block_table:    # warmup
                 continue
+            # num_cached_blocks 之前的是已经计算了kv cache的，所以不需要再计算
             for i in range(seq.num_cached_blocks, seq.num_blocks):
                 start = seq.block_table[i] * self.block_size
                 if i != seq.num_blocks - 1:
@@ -208,9 +209,16 @@ class ModelRunner:
     def run(self, seqs: list[Sequence], is_prefill: bool) -> list[int]:
         input_ids, positions = self.prepare_prefill(seqs) if is_prefill else self.prepare_decode(seqs)
         print("prepare_prefill" if is_prefill else "prepare_decode")
-        print(input_ids.shape, positions.shape)
-        print(input_ids)
-        print(positions)
+        context = get_context()
+        print("context")
+        print("slot_mapping.shape", context.slot_mapping.shape)
+        print("context_lens.shape", context.context_lens.shape)
+        print("block_tables.shape", context.block_tables.shape)
+        print("cu_seqlens_q", context.cu_seqlens_q)
+        print("cu_seqlens_k", context.cu_seqlens_k)
+        print("slot_mapping", context.slot_mapping)
+        print("context_lens", context.context_lens)
+        print("block_tables", context.block_tables)
         print("--------------------------------")
         temperatures = self.prepare_sample(seqs) if self.rank == 0 else None
         logits = self.run_model(input_ids, positions, is_prefill)
