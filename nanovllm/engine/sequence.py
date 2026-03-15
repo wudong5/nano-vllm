@@ -1,7 +1,7 @@
 from copy import copy
 from enum import Enum, auto
 from itertools import count
-from time import time
+import time
 
 from nanovllm.sampling_params import SamplingParams
 

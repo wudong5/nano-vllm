@@ -1,5 +1,5 @@
 from collections import deque
-from time import time
+import time
 
 from nanovllm.config import Config
 from nanovllm.engine.sequence import Sequence, SequenceStatus
