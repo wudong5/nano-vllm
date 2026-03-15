@@ -47,6 +47,10 @@ class LLMEngine:
 
     def step(self):
         seqs, is_prefill = self.scheduler.schedule()
+        if is_prefill:
+            total_tokens = sum(len(seq) for seq in seqs)
+            cached_tokens = sum(seq.num_cached_tokens for seq in seqs)
+            print(f"Prefill: total={total_tokens}, cached={cached_tokens}, hit_rate={cached_tokens/total_tokens:.1%}")
         token_ids = self.model_runner.call("run", seqs, is_prefill)
         self.scheduler.postprocess(seqs, token_ids)
         outputs = [(seq.seq_id, seq.completion_token_ids) for seq in seqs if seq.is_finished]

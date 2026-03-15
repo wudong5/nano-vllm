@@ -208,18 +208,6 @@ class ModelRunner:
 
     def run(self, seqs: list[Sequence], is_prefill: bool) -> list[int]:
         input_ids, positions = self.prepare_prefill(seqs) if is_prefill else self.prepare_decode(seqs)
-        print("prepare_prefill" if is_prefill else "prepare_decode")
-        context = get_context()
-        print("context")
-        print("slot_mapping.shape", context.slot_mapping.shape)
-        print("context_lens.shape", context.context_lens.shape)
-        print("block_tables.shape", context.block_tables.shape)
-        print("cu_seqlens_q", context.cu_seqlens_q)
-        print("cu_seqlens_k", context.cu_seqlens_k)
-        print("slot_mapping", context.slot_mapping)
-        print("context_lens", context.context_lens)
-        print("block_tables", context.block_tables)
-        print("--------------------------------")
         temperatures = self.prepare_sample(seqs) if self.rank == 0 else None
         logits = self.run_model(input_ids, positions, is_prefill)
         token_ids = self.sampler(logits, temperatures).tolist() if self.rank == 0 else None
